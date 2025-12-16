@@ -79,36 +79,40 @@ const App: React.FC = () => {
     });
   }, []);
 
-  // Simulation Loop
+  // Real Data Injection Loop (Driven by Perplexity Trends)
   useEffect(() => {
-    if (!isPurgeActive) return;
+    if (!isPurgeActive || trends.length === 0) return;
 
+    // Use fetched trends to drive the "Logs" to make them feel real
     const interval = setInterval(() => {
-      // Randomly update stats
+      // Randomly select a trend and simulate ingestion events related to it
+      const trend = trends[Math.floor(Math.random() * trends.length)];
+      const action = Math.random();
+
+      // Update stats slightly to show activity
       setStats(prev => ({
-        profilesIngested: prev.profilesIngested + Math.floor(Math.random() * 5),
-        proxiesActive: 800 + Math.floor(Math.random() * 100),
-        botsTrapped: prev.botsTrapped + (Math.random() > 0.7 ? 1 : 0),
-        dataVolumeMB: prev.dataVolumeMB + 0.05,
-        rpm: 400 + Math.floor(Math.random() * 100)
+        profilesIngested: prev.profilesIngested + 1,
+        proxiesActive: 800 + Math.floor(Math.random() * 50),
+        botsTrapped: prev.botsTrapped,
+        dataVolumeMB: prev.dataVolumeMB + 0.01,
+        rpm: 300 + Math.floor(Math.random() * 50)
       }));
 
-      // Randomly add logs
-      const rand = Math.random();
-      if (rand > 0.8) {
-        const platforms = ['Discord', 'Reddit', 'EpicGamesForum', 'Telegram'];
-        const platform = platforms[Math.floor(Math.random() * platforms.length)];
-        addLog('LXCrawler', `Scraped batch from ${platform}. IP Rotated.`, 'info');
-      } else if (rand > 0.95) {
-        addLog('Honeypot', 'T.2 Gateway triggered. Analyst bot blocked.', 'warning');
-      } else if (rand > 0.9) {
-        addLog('Fusion', 'Identity Match: ID_9921 -> Epic_Handle_X', 'success');
+      if (action > 0.7) {
+        // Log a "connection" to the real source
+        addLog('LXCrawler', `Connecting to live thread at ${trend.source}...`, 'info');
+      } else if (action > 0.4 && trend.raw_samples && trend.raw_samples.length > 0) {
+        // Log a REAL sample found by Perplexity
+        const sample = trend.raw_samples[Math.floor(Math.random() * trend.raw_samples.length)];
+        addLog('LXCrawler', `CAPTURED DATA: "${sample.slice(0, 60)}..."`, 'success');
+      } else if (action > 0.9) {
+        addLog('Fusion', `Correlating data from ${trend.source} with local patterns.`, 'info');
       }
 
-    }, 1500);
+    }, 3000); // Slower, more deliberate updates
 
     return () => clearInterval(interval);
-  }, [isPurgeActive, addLog]);
+  }, [isPurgeActive, trends, addLog]);
 
   return (
     <div className="min-h-screen bg-black text-gray-300 font-sans selection:bg-soul-purple selection:text-white flex flex-col">

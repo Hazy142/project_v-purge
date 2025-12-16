@@ -17,7 +17,13 @@ export const fetchGamingTrends = async (): Promise<TrendData[]> => {
       3. Trends in "whale" behavior among teenagers or high spending reports.
 
       Return a summary of 3 distinct, real topics/threads found.
-      Format the output strictly as a JSON array of objects with keys: "title", "source" (e.g., "Reddit r/FortNiteBR"), "snippet" (a brief summary of the discussion), "url" (link to the source if available, otherwise a search link).
+      Format the output strictly as a JSON array of objects with keys:
+      - "title"
+      - "source" (e.g., "Reddit r/FortNiteBR", "Twitter @user")
+      - "snippet" (a brief summary of the discussion)
+      - "url" (link to the source)
+      - "raw_samples" (Array of strings: Exact quotes or username/comment pairs found in the thread to simulate a scrape. e.g. ["UserX: I hate this price", "Gamer123: Is this scam real?"])
+
       Ensure the response is valid raw JSON. Do not include markdown formatting or backticks.
     `;
 
@@ -28,11 +34,11 @@ export const fetchGamingTrends = async (): Promise<TrendData[]> => {
         "Content-Type": "application/json"
       },
       body: JSON.stringify({
-        model: "llama-3.1-sonar-large-128k-online",
+        model: "sonar-pro",
         messages: [
           {
             role: "system",
-            content: "You are a data extraction agent for V-PURGE. You find real-time intelligence on gamer spending habits and scams. You output strictly valid JSON."
+            content: "You are a data extraction agent for V-PURGE, running on the Soul Algorithm infrastructure. You find real-time intelligence on gamer spending habits, scams, and 'whale' behavior. You output strictly valid JSON with raw sample data."
           },
           {
             role: "user",
@@ -91,11 +97,11 @@ export const analyzeTargetCraving = async (profileText: string): Promise<string>
               "Content-Type": "application/json"
             },
             body: JSON.stringify({
-              model: "llama-3.1-sonar-small-128k-online",
+              model: "sonar",
               messages: [
                 {
                     role: "system",
-                    content: "You are a psychological profiler analyzing gamer text for spending addiction."
+                    content: "You are a psychological profiler (LiLingXi persona) analyzing gamer text for spending addiction and vulnerability."
                 },
                 {
                     role: "user",
