@@ -3,7 +3,7 @@ import { Terminal } from './components/Terminal';
 import { StatPanel } from './components/StatPanel';
 import { NetworkGraph } from './components/NetworkGraph';
 import { LogEntry, ScraperStats, TrendData } from './types';
-import { fetchGamingTrends } from './services/geminiService';
+import { fetchGamingTrends, analyzeTargetCraving } from './services/perplexityService';
 import { Terminal as TerminalIcon, Search, Skull, Lock, Zap } from 'lucide-react';
 import { ResponsiveContainer, AreaChart, Area, XAxis, YAxis, Tooltip, CartesianGrid } from 'recharts';
 
@@ -37,17 +37,26 @@ const App: React.FC = () => {
     addLog('LXCrawler', 'Swarm deployment initialized. Target: Discord/Reddit/Fortnite_LFG', 'info');
   }, []);
 
-  // Fetch Gemini Trends
+  // Fetch Perplexity Trends
   useEffect(() => {
     const getTrends = async () => {
       setLoadingTrends(true);
-      addLog('Fusion', 'Requesting Grounded Intelligence from Gemini-2.5-Flash...', 'info');
+      addLog('Fusion', 'Requesting Grounded Intelligence from Perplexity Sonar Swarm...', 'info');
       const data = await fetchGamingTrends();
       if (data.length > 0) {
         setTrends(data);
-        addLog('Fusion', 'Intelligence Feed Updated with Live Search Data.', 'success');
+        addLog('Fusion', 'Intelligence Feed Updated with Real-Time Perplexity Data.', 'success');
+
+        // Simulate deeper analysis on the first item found
+        if (data[0] && data[0].snippet) {
+             addLog('Profiler', 'Analyzing Target Craving on Trend #1...', 'info');
+             analyzeTargetCraving(data[0].snippet).then(analysis => {
+                 addLog('Profiler', `Analysis Result: ${analysis.slice(0, 100)}...`, 'success');
+             });
+        }
+
       } else {
-         addLog('Fusion', 'Intelligence Fetch Failed. Retrying...', 'error');
+         addLog('Fusion', 'Perplexity Intelligence Fetch Failed. Retrying...', 'error');
       }
       setLoadingTrends(false);
     };
@@ -227,7 +236,7 @@ const App: React.FC = () => {
            
            <div className="flex-1 overflow-y-auto p-4 space-y-4">
               <div className="text-[10px] text-gray-500 mb-2 uppercase tracking-wide">
-                Live Data from Surface Web (Gemini Search)
+                Live Data from Surface Web (Perplexity Sonar)
               </div>
               
               {trends.length === 0 && !loadingTrends && (
