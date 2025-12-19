@@ -3,7 +3,7 @@ import { Terminal } from './components/Terminal';
 import { StatPanel } from './components/StatPanel';
 import { NetworkGraph } from './components/NetworkGraph';
 import { LogEntry, ScraperStats, TrendData } from './types';
-import { fetchGamingTrends } from './services/geminiService';
+import { fetchGamingTrends, analyzeTargetCraving } from './services/perplexityService';
 import { Terminal as TerminalIcon, Search, Skull, Lock, Zap } from 'lucide-react';
 import { ResponsiveContainer, AreaChart, Area, XAxis, YAxis, Tooltip, CartesianGrid } from 'recharts';
 
@@ -37,17 +37,26 @@ const App: React.FC = () => {
     addLog('LXCrawler', 'Swarm deployment initialized. Target: Discord/Reddit/Fortnite_LFG', 'info');
   }, []);
 
-  // Fetch Gemini Trends
+  // Fetch Perplexity Trends
   useEffect(() => {
     const getTrends = async () => {
       setLoadingTrends(true);
-      addLog('Fusion', 'Requesting Grounded Intelligence from Gemini-2.5-Flash...', 'info');
+      addLog('Fusion', 'Requesting Grounded Intelligence from Perplexity Sonar Swarm...', 'info');
       const data = await fetchGamingTrends();
       if (data.length > 0) {
         setTrends(data);
-        addLog('Fusion', 'Intelligence Feed Updated with Live Search Data.', 'success');
+        addLog('Fusion', 'Intelligence Feed Updated with Real-Time Perplexity Data.', 'success');
+
+        // Simulate deeper analysis on the first item found
+        if (data[0] && data[0].snippet) {
+             addLog('Profiler', 'Analyzing Target Craving on Trend #1...', 'info');
+             analyzeTargetCraving(data[0].snippet).then(analysis => {
+                 addLog('Profiler', `Analysis Result: ${analysis.slice(0, 100)}...`, 'success');
+             });
+        }
+
       } else {
-         addLog('Fusion', 'Intelligence Fetch Failed. Retrying...', 'error');
+         addLog('Fusion', 'Perplexity Intelligence Fetch Failed. Retrying...', 'error');
       }
       setLoadingTrends(false);
     };
@@ -70,36 +79,40 @@ const App: React.FC = () => {
     });
   }, []);
 
-  // Simulation Loop
+  // Real Data Injection Loop (Driven by Perplexity Trends)
   useEffect(() => {
-    if (!isPurgeActive) return;
+    if (!isPurgeActive || trends.length === 0) return;
 
+    // Use fetched trends to drive the "Logs" to make them feel real
     const interval = setInterval(() => {
-      // Randomly update stats
+      // Randomly select a trend and simulate ingestion events related to it
+      const trend = trends[Math.floor(Math.random() * trends.length)];
+      const action = Math.random();
+
+      // Update stats slightly to show activity
       setStats(prev => ({
-        profilesIngested: prev.profilesIngested + Math.floor(Math.random() * 5),
-        proxiesActive: 800 + Math.floor(Math.random() * 100),
-        botsTrapped: prev.botsTrapped + (Math.random() > 0.7 ? 1 : 0),
-        dataVolumeMB: prev.dataVolumeMB + 0.05,
-        rpm: 400 + Math.floor(Math.random() * 100)
+        profilesIngested: prev.profilesIngested + 1,
+        proxiesActive: 800 + Math.floor(Math.random() * 50),
+        botsTrapped: prev.botsTrapped,
+        dataVolumeMB: prev.dataVolumeMB + 0.01,
+        rpm: 300 + Math.floor(Math.random() * 50)
       }));
 
-      // Randomly add logs
-      const rand = Math.random();
-      if (rand > 0.8) {
-        const platforms = ['Discord', 'Reddit', 'EpicGamesForum', 'Telegram'];
-        const platform = platforms[Math.floor(Math.random() * platforms.length)];
-        addLog('LXCrawler', `Scraped batch from ${platform}. IP Rotated.`, 'info');
-      } else if (rand > 0.95) {
-        addLog('Honeypot', 'T.2 Gateway triggered. Analyst bot blocked.', 'warning');
-      } else if (rand > 0.9) {
-        addLog('Fusion', 'Identity Match: ID_9921 -> Epic_Handle_X', 'success');
+      if (action > 0.7) {
+        // Log a "connection" to the real source
+        addLog('LXCrawler', `Connecting to live thread at ${trend.source}...`, 'info');
+      } else if (action > 0.4 && trend.raw_samples && trend.raw_samples.length > 0) {
+        // Log a REAL sample found by Perplexity
+        const sample = trend.raw_samples[Math.floor(Math.random() * trend.raw_samples.length)];
+        addLog('LXCrawler', `CAPTURED DATA: "${sample.slice(0, 60)}..."`, 'success');
+      } else if (action > 0.9) {
+        addLog('Fusion', `Correlating data from ${trend.source} with local patterns.`, 'info');
       }
 
-    }, 1500);
+    }, 3000); // Slower, more deliberate updates
 
     return () => clearInterval(interval);
-  }, [isPurgeActive, addLog]);
+  }, [isPurgeActive, trends, addLog]);
 
   return (
     <div className="min-h-screen bg-black text-gray-300 font-sans selection:bg-soul-purple selection:text-white flex flex-col">
@@ -227,7 +240,7 @@ const App: React.FC = () => {
            
            <div className="flex-1 overflow-y-auto p-4 space-y-4">
               <div className="text-[10px] text-gray-500 mb-2 uppercase tracking-wide">
-                Live Data from Surface Web (Gemini Search)
+                Live Data from Surface Web (Perplexity Sonar)
               </div>
               
               {trends.length === 0 && !loadingTrends && (

@@ -1,7 +1,7 @@
 export interface LogEntry {
   id: string;
   timestamp: string;
-  module: 'LXCrawler' | 'Honeypot' | 'Fusion' | 'System';
+  module: 'LXCrawler' | 'Honeypot' | 'Fusion' | 'System' | 'Profiler';
   message: string;
   status: 'info' | 'success' | 'warning' | 'error';
 }
@@ -28,4 +28,5 @@ export interface TrendData {
   source: string;
   url: string;
   snippet: string;
+  raw_samples?: string[]; // New field for "real" gathered samples
 }
